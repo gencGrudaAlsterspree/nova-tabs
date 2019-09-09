@@ -184,7 +184,7 @@ export default {
       }
       // check max length, if exceeds max_keys, remove first (oldest)
       if(tracked_keys.length > tab_state_max_keys) {
-        tracked_keys.shift();
+        localStorage.removeItem(tracked_keys.shift());
       }
       localStorage.setItem(tracker_key, JSON.stringify(tracked_keys));
     }
