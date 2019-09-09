@@ -43,6 +43,10 @@
 
 <script>
 import BehavesAsPanel from "laravel-nova/src/mixins/BehavesAsPanel";
+let tab_state_enable = (_.isUndefined(Storage) === false && JSON !== undefined),
+    tab_state_prefix = 'nova:tabs:',
+    tab_state_max_keys = 25 // 25 or whatever
+;
 export default {
   mixins: [BehavesAsPanel],
   data() {
@@ -98,6 +102,12 @@ export default {
       tabs[field.tab].fields.push(field);
     });
     this.tabs = tabs;
+    
+    if(tab_state_enable) {
+      // where the heck is `this.$route.query.tab` coming from?
+      this.$route.query.tab = this.getTabState();
+    }
+
     if(!_.isUndefined(this.$route.query.tab)) {
         if(_.isUndefined(tabs[this.$route.query.tab])) {
             this.handleTabClick(tabs[Object.keys(tabs)[0]]);
@@ -119,6 +129,9 @@ export default {
     handleTabClick(tab, event) {
       tab.init = true;
       this.activeTab = tab.name;
+      if(tab_state_enable) {
+        this.storeTabState();
+      }
     },
     /**
      * Slugify
@@ -138,6 +151,42 @@ export default {
       return field.prefixComponent
         ? "detail-" + field.component
         : field.component;
+    },
+    /**
+     * @demo
+     * store tab-state (clicked)
+     */
+    storeTabState() {
+      let key_path = tab_state_prefix + this.$route.path;
+      localStorage.setItem(key_path, this.activeTab);
+      this.trackTabState(key_path);
+    },
+    /**
+     * @demo
+     * get tab-state (mounted)
+     */
+    getTabState() {
+      return localStorage.getItem(tab_state_prefix + this.$route.path);
+    },
+    /**
+     * @demo
+     * track keys, after max of `tab_state_max_keys` reached, just start removing the first (oldest) one.
+     * @param key_path
+     */
+    trackTabState(key_path) {
+      let tracker_key = tab_state_prefix + 'tracked-keys',
+          tracked_keys = localStorage.getItem(tracker_key);
+
+      tracked_keys = tracked_keys !== null ? JSON.parse(tracked_keys) : [];
+      // check if path exists, if not add
+      if(tracked_keys.indexOf(key_path) === -1) {
+        tracked_keys.push(key_path);
+      }
+      // check max length, if exceeds max_keys, remove first (oldest)
+      if(tracked_keys.length > tab_state_max_keys) {
+        tracked_keys.shift();
+      }
+      localStorage.setItem(tracker_key, JSON.stringify(tracked_keys));
     }
   }
 };
