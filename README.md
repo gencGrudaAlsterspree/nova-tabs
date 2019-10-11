@@ -1,24 +1,57 @@
 # Laravel Nova Tabs Package
 [![Latest Version on Github](https://img.shields.io/packagist/v/eminiarts/nova-tabs.svg?style=flat)](https://packagist.org/packages/eminiarts/nova-tabs)
 
-1. [Installation](#Installation)
-2. [Usage](#Usage)
+## Local Development Version
+
+Clone repository, e.g. in laravel root directory called `packages`.
+
+```bash
+$: mkdir packages && cd packages
+$: mkdir wize-wiz && cd wize-wiz
+$: git clone git@github.com:wize-wiz/nova-tabs.git
+```
+
+The directory structure should now look like `laravel-root/packages/wize-wiz/nova-tabs`
+
+Let composer know to add this package via symlink by adding the following
+to the `composer.json` file.
+
+```bash
+"repositories": {
+  ... 
+  "wize-wiz/nova-tabs": {
+    "type": "path",
+    "url": "./packages/wize-wiz/nova-tabs",
+    "options": {
+        "symlink": true
+    }
+  }
+  ...
+}
+```
+
+Require the package with
+
+```bash
+composer require wize-wiz/nova-tabs:"@dev"
+``` 
+
+
+
+
+1. [Usage](#Usage)
     1. [Tabs Panel](#tabs-panel)
     2. [Tabs Panel with Toolbar](#tabs-panel-with-toolbar)
     3. [Relationship Tabs](#relationship-tabs)
     4. [Combine Fields and Relations in Tabs](#combine-fields-and-relations-in-tabs)
     5. [Actions in Tabs](#actions-in-tabs)
     6. [Tabs on Edit View](#tabs-on-edit-view)
-3. [Customization](#customization)
-4. [Upgrade to 1.0.0](#upgrade-to-1.0.0)
+2. [Customization](#customization)
+3. [Upgrade to 1.0.0](#upgrade-to-1.0.0)
 
 ## Installation
 
-You can install the package in to a Laravel app that uses [Nova](https://nova.laravel.com) via composer:
-
-```bash
-composer require eminiarts/nova-tabs
-```
+~~You can install the package in to a Laravel app that uses [Nova](https://nova.laravel.com) via composer:~~
 
 ## Usage
 
