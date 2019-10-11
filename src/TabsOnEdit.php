@@ -7,6 +7,89 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 
 trait TabsOnEdit
 {
+
+    /**
+     * This will call ResolvesField::creationFields instead of the modified TabsOnEdit::creationFields
+     *
+     * @param NovaRequest $request
+     */
+    public function parentCreationFields(NovaRequest $request)
+    {
+        return parent::creationFields($request);
+    }
+
+    /**
+     * This will call ResolvesField::updateFields instead of the modified TabsOnEdit::updateFields
+     *
+     * @param NovaRequest $request
+     */
+    public function parentUpdateFields(NovaRequest $request)
+    {
+        return parent::updateFields($request);
+    }
+
+    /**
+     * @param  NovaRequest $request
+     * @return mixed
+     */
+    public static function rulesForCreation(NovaRequest $request)
+    {
+        return static::formatRules($request, (new static(static::newModel()))
+            ->parentCreationFields($request)
+            ->reject(function ($field) use ($request) {
+                return $field->isReadonly($request);
+            })
+            ->mapWithKeys(function ($field) use ($request) {
+                return $field->getCreationRules($request);
+            })->all());
+    }
+
+    /**
+     * Get the validation rules for a resource update request.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
+     * @return array
+     */
+    public static function rulesForUpdate(NovaRequest $request)
+    {
+        return static::formatRules($request, (new static(static::newModel()))
+            ->parentUpdateFields($request)
+            ->reject(function ($field) use ($request) {
+                return $field->isReadonly($request);
+            })
+            ->mapWithKeys(function ($field) use ($request) {
+                return $field->getUpdateRules($request);
+            })->all());
+    }
+
+    /**
+     * Return the creation fields excluding any readonly ones.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return \Illuminate\Support\Collection
+     */
+    public function creationFieldsWithoutReadonly(NovaRequest $request)
+    {
+        return $this->parentCreationFields($request)
+            ->reject(function ($field) use ($request) {
+                return $field->isReadonly($request);
+            });
+    }
+
+    /**
+     * Return the update fields excluding any readonly ones.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @return \Illuminate\Support\Collection
+     */
+    public function updateFieldsWithoutReadonly(NovaRequest $request)
+    {
+        return $this->parentUpdateFields($request)
+            ->reject(function ($field) use ($request) {
+                return $field->isReadonly($request);
+            });
+    }
+
     /**
      * Resolve the creation fields.
      *
@@ -24,77 +107,6 @@ trait TabsOnEdit
                 ],
             ]
         );
-    }
-
-    /**
-     * Fill a new model instance using the given request.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
-     * @param  \Illuminate\Database\Eloquent\Model     $model
-     * @return array
-     */
-    public static function fill(NovaRequest $request, $model)
-    {
-        return static::fillFields(
-            $request, $model,
-            (new static($model))->parentCreationFields($request)
-        );
-    }
-
-    /**
-     * @param NovaRequest $request
-     * @param $model
-     */
-    public static function fillForUpdate(NovaRequest $request, $model)
-    {
-        return static::fillFields(
-            $request, $model,
-            (new static($model))->parentUpdateFields($request)
-        );
-    }
-
-    /**
-     * @param NovaRequest $request
-     */
-    public function parentCreationFields(NovaRequest $request)
-    {
-        return parent::creationFields($request);
-    }
-
-    /**
-     * @param NovaRequest $request
-     */
-    public function parentUpdateFields(NovaRequest $request)
-    {
-        return parent::updateFields($request);
-    }
-
-    /**
-     * @param  NovaRequest $request
-     * @return mixed
-     */
-    public static function rulesForCreation(NovaRequest $request)
-    {
-        return static::formatRules($request, (new static(static::newModel()))
-                ->parentCreationFields($request)
-                ->mapWithKeys(function ($field) use ($request) {
-                    return $field->getCreationRules($request);
-                })->all());
-    }
-
-    /**
-     * Get the validation rules for a resource update request.
-     *
-     * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
-     * @return array
-     */
-    public static function rulesForUpdate(NovaRequest $request)
-    {
-        return static::formatRules($request, (new static(static::newModel()))
-                ->parentUpdateFields($request)
-                ->mapWithKeys(function ($field) use ($request) {
-                    return $field->getUpdateRules($request);
-                })->all());
     }
 
     /**
@@ -127,7 +139,7 @@ trait TabsOnEdit
     {
         return $panels->map(function ($field) use ($label) {
             if ( !is_array($field) && !$field->panel ) {
-                 $field->panel = $label;
+                $field->panel = $label;
             }
 
             return $field;
