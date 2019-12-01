@@ -2,11 +2,29 @@
 namespace Eminiarts\Tabs;
 
 use Laravel\Nova\Panel;
-use Illuminate\Support\Collection;
+use Laravel\Nova\Fields\FieldCollection;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 trait TabsOnEdit
 {
+//    /**
+//     * Resolve the creation fields.
+//     *
+//     * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
+//     * @return \Illuminate\Support\Collection
+//     */
+//    public function creationFields(NovaRequest $request)
+//    {
+//        return new FieldCollection(
+//            [
+//                'Tabs' => [
+//                    'component' => 'tabs',
+//                    'fields'    => $this->removeNonCreationFields($request, $this->resolveFields($request)),
+//                    'panel'     => Panel::defaultNameForCreate($request->newResource()),
+//                ],
+//            ]
+//        );
+//    }
 
     /**
      * This will call ResolvesField::creationFields instead of the modified TabsOnEdit::creationFields
@@ -98,7 +116,8 @@ trait TabsOnEdit
      */
     public function creationFields(NovaRequest $request)
     {
-        return collect(
+        // return collect()
+        return new FieldCollection(
             [
                 'Tabs' => [
                     'component' => 'tabs',
@@ -117,7 +136,8 @@ trait TabsOnEdit
      */
     public function updateFields(NovaRequest $request)
     {
-        return collect(
+        // return collect()
+        return new FieldCollection(
             [
                 'Tabs' => [
                     'component' => 'tabs',
@@ -131,11 +151,11 @@ trait TabsOnEdit
     /**
      * Assign the fields with the given panels to their parent panel.
      *
-     * @param  string                           $label
-     * @param  \Illuminate\Support\Collection   $panels
-     * @return \Illuminate\Support\Collection
+     * @param string                               $label
+     * @param \Laravel\Nova\Fields\FieldCollection $panels
+     * @return \Laravel\Nova\Fields\FieldCollection
      */
-    protected function assignToPanels($label, Collection $panels)
+    protected function assignToPanels($label, FieldCollection $panels)
     {
         return $panels->map(function ($field) use ($label) {
             if ( !is_array($field) && !$field->panel ) {
