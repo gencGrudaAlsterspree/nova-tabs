@@ -68,7 +68,7 @@ trait TabsOnEdit
      * @param  \Laravel\Nova\Http\Requests\NovaRequest $request
      * @return array
      */
-    public static function rulesForUpdate(NovaRequest $request)
+    public static function rulesForUpdate(NovaRequest $request, $resource = null)
     {
         return static::formatRules($request, (new static(static::newModel()))
             ->parentUpdateFields($request)
